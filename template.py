@@ -16,7 +16,7 @@ from termcolor import colored
 
 
 pattern_re = re.compile(r"(\[.*\])")
-variable_re = re.compile(r"(\{[^}]*\})")
+macro_re = re.compile(r"(\{[^}]*\})")
 
 class Template:
     def __init__(self, value, score):
@@ -63,24 +63,61 @@ class TemplateContext:
 
         return content
 
-    def expand_variables(self, template):
+
+    def expand_macros(self, template):
         os.system('clear')
+
         while True:
-            occ = False
-            m = variable_re.search(template)
+            m = macro_re.search(template)
             if m is not None:
-                var_name = m.group(1)[1:-1]
-                value = input("--> %s = " % var_name)
-                template = template[:m.start()] + value + template[m.end():]
+                macro = m.group(1)[1:-1]
+                if '|' in macro:
+                    # The user will choose a text
+                    expanded_str = self.expand_choices(macro)
+                else:
+                    # The user will fill a variable
+                    expanded_str = self.expand_variable(macro)
+                template = template[:m.start()] + expanded_str + template[m.end():]
+
             else:
                 break
+
         return template
+
+
+    def expand_variable(self, macro):
+        return input("--> %s = " % macro)
+
+
+    def expand_choices(self, macro):
+        splited_macro = macro.split('|')
+        if len(splited_macro) <= 2:
+            print("Choices (%s) cannot be expanded" % macro)
+            return "<choice error>"
+
+        question, answers = splited_macro[0], splited_macro[1:]
+
+        print("--> %s" % question)
+        for idx, answer in enumerate(answers):
+            print("* %2d) %s" % (idx + 1, answer))
+
+        while True:
+            value = input("Your choice: ")
+            try:
+                choice = int(value)
+                if choice < 1 or choice > len(answers):
+                    continue
+
+                return answers[choice - 1]
+
+            except ValueError:
+                continue
 
 
     def get_template(self, key):
         if key in self.templates:
             template = self.expand_template(key)
-            template = self.expand_variables(template)
+            template = self.expand_macros(template)
             self.templates[key].score += 1
             return template
         return None
@@ -121,7 +158,7 @@ def load_templates_from_csv(filename, context=None):
             if key.startswith('['):
                 context.add_pattern(key, value)
             else:
-                context.add_template(key, value)
+                context.add_template(key, value, score)
 
         return context
     return None
