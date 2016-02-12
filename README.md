@@ -46,23 +46,26 @@ published and shared.
 
 **Todo**: example of spreadsheet
 
-### Including a template into another template
+### Boilerplates
+A boilerplate is any text that is or can be reused in new contexts or
+applications without being greatly changed from the original.
+
 You may want to include a template in another one. For example, if several
 templates contain a signature at the end of the text, a smart way to manage the
 templates would be to create another template called *signature* and to include
 it in those templates. It would be easier to edit your signature only at one
 place instead of editing every template involving a signature.
 
-I call this type of template "macros".
+I call this type of template boilerplates.
 
-#### Declaration of a macro
-A macro is a template which name is surrounded by **[]**. For example,
-**[SIGNATURE]**.
+#### Declaration of a boilerplate
+A boilerplate is declared as a template, but its name is surrounded by **[**
+and **]**. For example, **[SIGNATURE]**.
 
-#### Using a macro
-To include a macro in a template (for example **[SIGNATURE]**), you just need to
-use its name in the value of the template. The macro is automatically expanded.
-Also, a macro's value can contain a macro that would be expanded, and so on.
+#### Using a boilerplate
+To include a boilerplate in a template (for example **[SIGNATURE]**), you just need to
+use its name in the text of the template. The macro is automatically expanded.
+Also, a boilerplate value can contain another boilerplate.
 
 ### User input
 ### User choices
